@@ -1,48 +1,65 @@
 function addOperators(num: string, target: number): string[] {
+  let result: string[] = [];
+
   function backtrack(
-    num: number,
-    index: number,
-    target: number,
-    running_sum: number,
-    
-    result: string[]
+    pivot: number,
+    path: string,
+    calculated: number,
+    tail: number
   ) {
-    // Base Case
-    if (target == 0) {
-      result.push(`${running_sum}`);
-      return;
+    // base case
+    if (pivot == num.length) {
+      if (calculated == target) {
+        result.push(path);
+      }
     }
-    if (target < 0 || num <= 0) {
-      return;
+
+    // for loop based choose case
+    for (let index = pivot; index < num.length; index++) {
+      let strNum: string = num.slice(pivot, index + 1);
+      let currentNum = Number(strNum)!;
+      if (currentNum == 0 && pivot != index) continue;
+      if (index == 0) {
+        backtrack(index + 1, path + strNum, currentNum, currentNum);
+      } else {
+        // +
+        backtrack(
+          index + 1,
+          path + "+" + strNum,
+          calculated + currentNum,
+          currentNum
+        );
+
+        // -
+        backtrack(
+          index + 1,
+          path + "-" + strNum,
+          calculated - currentNum,
+          -currentNum
+        );
+
+        // *
+        backtrack(
+          index + 1,
+          path + "*" + strNum,
+          calculated - tail + tail * currentNum,
+          tail * currentNum
+        );
+      }
     }
-    // Logic
-
-    // extract digit
-    const digits = [];
-    let temp = num;
-
-    digits.unshift(temp % 10); // Extract the last digit and add it to the beginning of the array
-    temp = Math.floor(temp / 10); // Remove the last digit
-
-    // No Choose Case
-    backtrack(num, index + 1, target, path, result);
-    // Choose Case
-    path.push(num[index]);
-    backtrack(num, index, target - candidates[index], path, result);
-    path.pop(); // Backtracking Approach
   }
 
-  let results: string[] = [];
-  let number = parseInt(num, 10);
+  backtrack(0, "", 0, 0);
 
-  backtrack(number, 0, target, [], results);
-  return results;
+  console.log(result);
+
+  return result;
 }
 
 describe("Expression Add Operators", () => {
   it("Happy Path - 01", () => {
     let num = "123",
       target = 6;
-    expect(addOperators(num, target)).toStrictEqual(["1*2*3", "1+2+3"]);
+    expect(addOperators(num, target)).toStrictEqual(["1+2+3", "1*2*3"]);
   });
 });

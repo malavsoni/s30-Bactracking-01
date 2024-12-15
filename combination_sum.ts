@@ -59,6 +59,30 @@ function combinationSumV2(candidates: number[], target: number): number[][] {
   return results;
 }
 
+function combinationSumPivot(candidates: number[], target: number): number[][] {
+  let results: number[][] = [];
+  function backtrack(pivot: number, sum: number, path: number[]) {
+    if (sum == target) {
+      results.push([...path]);
+      return;
+    }
+
+    if (pivot == candidates.length || sum > target) {
+      return;
+    }
+
+    for (let index = pivot; index < candidates.length; index++) {
+      path.push(candidates[index]);
+      backtrack(index, sum + candidates[index], path);
+      path.pop();
+    }
+  }
+
+  backtrack(0, 0, []);
+
+  return results;
+}
+
 describe("Combination Sum", () => {
   it("Happy Path - 01", () => {
     let candidates = [2, 3, 6, 7];
@@ -73,5 +97,11 @@ describe("Combination Sum", () => {
       [7],
       [2, 2, 3],
     ]);
+  });
+
+  it("Happy Path - Pivot", () => {
+    let candidates = [2, 3, 6, 7];
+    let target = 7;
+    expect(combinationSumPivot(candidates, target)).toEqual([[2, 2, 3], [7]]);
   });
 });
